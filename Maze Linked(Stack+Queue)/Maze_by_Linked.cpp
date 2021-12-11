@@ -54,21 +54,19 @@ public:
 
     void RowNCol(const char* fname) {    // 행열 세기
         char load;
-        int c = 0, r = 1;      // 첫줄부터 읽으므로 row는 1부터 시작
+        row = 1, column = 0; // 첫줄부터 읽으므로 row는 1부터 시작
         FILE* Maze;
         fopen_s(&Maze, fname, "rb");
         if (Maze != NULL) {
             // 첫번째 while문에서는 첫줄만 읽어서 공백이 아닌 부분의 개수를 세어 col의 값을 센다.
-            while ((load = fgetc(Maze)) != '\n' && load != '\r') { if (load != ' ') ++c; }
+            while ((load = fgetc(Maze)) != '\n' && load != '\r') { if (load != ' ') ++column; }
             
             // 두번째 while문에서는 개행문자의 개수만 세어서 row의 값을 센다.
-            while ((load = fgetc(Maze)) != EOF) { if (load == '\n') ++r; }
+            while ((load = fgetc(Maze)) != EOF) { if (load == '\n') ++row; }
             
             fclose(Maze);
         }
         // printf("행 * 열  = %d * %d\n", r, c);
-        row = r;
-        column = c;
         init(row, column);
     }
 
