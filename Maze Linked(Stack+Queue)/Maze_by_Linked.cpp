@@ -14,6 +14,7 @@ private:
     LinkedStack locStack;   // 스택
     LinkedQueue locQueue;   // 큐
     Location2D exitLoc;     // 미로의 출구
+    int count = 0;          // 길을 찾는 횟수
 public:
     void init(int row, int col) { //map 이차원 배열을 동적으로 할당
         map = new int* [row];
@@ -31,7 +32,7 @@ public:
         FILE* Maze;
         fopen_s(&Maze, fname, "rb");
         if (Maze != NULL) {
-            fscanf_s(Maze, "%d %d", &column, &row);
+            fscanf_s(Maze, "%d %d", &row, &column);
             if ((load = fgetc(Maze)) == '\n' || load == '\r') {
                 init(row, column);
                 fclose(Maze);
@@ -61,7 +62,7 @@ public:
         init(row, column);
     }
 
-    void Load(const char* fname, int check) { //파일에서 미로 파일을 읽어옴
+    void Load(const char* fname, int check) { // 파일에서 미로 파일을 읽어옴
         char load;
         FILE* Maze;
         fopen_s(&Maze, fname, "rb");
@@ -113,12 +114,14 @@ public:
     bool isValidLoc(int r, int c) {
         if (r < 0 || c < 0 || r >= row || c >= column) //범위를 벗어나면 갈 수 없다
             return false;
-        else //비어있는 통로나 도착지점일 때만 true
+        else { //비어있는 통로나 도착지점일 때만 true
             return (map[r][c] == 0 || map[r][c] == 'x');
+        }
     }
 
     void print() {  //현재 Maze를 화면에 출력
         printf("전체 미로의 크기 = %d * %d\n", row, column);
+        printf("길을 탐색한 횟수 : %d\n", count);
         for (int i = 0; i < row; ++i) {
             for (int j = 0; j < column; ++j) {
                 if (map[i][j] == 0) {
@@ -142,23 +145,26 @@ public:
         printf("\n");
     }
 
-    void searchExitToStack() { //실제 미로를 탐색하는 함수
+    void searchExitToStack() { // 실제 미로를 탐색하는 함수
         print();
         Sleep(400);
-        while (locStack.isEmpty() == false) {  //스택이 비어있지 않는 동안
-            Location2D* here = locStack.pop()->getLocation(); //스택에 상단 객체 복사
+        while (locStack.isEmpty() == false) {  // 스택이 비어있지 않는 동안
+            Location2D* here = locStack.pop()->getLocation(); // 스택에 상단 객체 복사
+            ++count;
             int r = here->getRow();
             int c = here->getCol();
 
-            map[r][c] = 7; //시작점은 최적 경로
+            map[r][c] = 7; // 시작점은 최적 경로
             if (exitLoc.getCol() == c && exitLoc.getRow() == r) {
+                printf("미로탐색 성공!!\n");
+                count = 0;
                 return;
             }
             else {
                 map[r][c] = 7; //지나온 곳으로 표기
                 system("cls");
                 print();
-                //갈 수 있는 곳 다 가본다
+                // 갈 수 있는 곳 다 가본다
                 if (isValidLoc(r - 1, c)) { locStack.push(new Node(r - 1, c)); }
                 if (isValidLoc(r + 1, c)) { locStack.push(new Node(r + 1, c)); }
                 if (isValidLoc(r, c - 1)) { locStack.push(new Node(r, c - 1)); }
@@ -166,21 +172,26 @@ public:
                 Sleep(400);
             }
         }
+        printf("미로탐색 실패ㅠㅠ\n");
+        count = 0;
     }
 
-    void searchExitToQueue() { //실제 미로를 탐색하는 함수
+    void searchExitToQueue() { // 실제 미로를 탐색하는 함수
         print();
-        while (locQueue.isEmpty() == false) {  //스택이 비어있지 않는 동안
-            Location2D* here = locQueue.dequeue()->getLocation(); //스택에 상단 객체 복사
+        while (locQueue.isEmpty() == false) {  // 스택이 비어있지 않는 동안
+            Location2D* here = locQueue.dequeue()->getLocation(); // 스택에 상단 객체 복사
+            ++count;
             int r = here->getRow();
             int c = here->getCol();
 
-            map[r][c] = 7; //시작점은 최적 경로
+            map[r][c] = 7; // 시작점은 최적 경로
             if (exitLoc.getCol() == c && exitLoc.getRow() == r) {
+                printf("미로탐색 성공!!\n");
+                count = 0;
                 return;
             }
             else {
-                map[r][c] = 7; //지나온 곳으로 표기
+                map[r][c] = 7; // 지나온 곳으로 표기
                 system("cls");
                 print();
                 Sleep(400);
@@ -192,6 +203,8 @@ public:
                 if (isValidLoc(r, c + 1)) { locQueue.enqueue(new Node(r, c + 1)); }
             }
         }
+        printf("미로탐색 실패ㅠㅠ\n");
+        count = 0;
     }
 };
 
@@ -199,14 +212,14 @@ int main() {
     Maze maze;
     int check = 0;
     while (true) {
-        printf("너비우선으로 탐색하고 싶으면 1번, 깊이 우선으로 탐색하고 싶으면 2를 입력하세요.");
+        printf("너비 우선 탐색(Queue) : 1 , 깊이 우선 탐색(Stack) : 2\n");
         scanf_s("%d", &check);
-        maze.Load("미로 test.txt", check);
+        maze.Load("미로 행열개수세기.txt", check);
         if (check == 1)
             maze.searchExitToQueue();
         else
             maze.searchExitToStack();
-        printf(" 초기화면으로 가시고 싶으면 1번 프로그램 종료를 원하시면 2번을 입력하세요");
+        printf("초기화면 1, 프로그램 종료 2\n");
         scanf_s("%d", &check);
         if (check == 2)
             break;
