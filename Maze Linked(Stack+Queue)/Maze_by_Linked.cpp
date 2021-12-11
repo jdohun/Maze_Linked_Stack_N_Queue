@@ -3,6 +3,8 @@
 #include <cstdlib>
 #include <Windows.h>
 
+int choice = 0;  // 
+
 class Maze {
 public:
     Maze() { init(0, 0); }
@@ -21,6 +23,7 @@ public:
         for (int i = 0; i < row; i++)
             map[i] = new int[col];
     }
+
     void reset() { //미로 맵 maze를 동적으로 해제
         for (int i = 0; i < row; i++)
             delete[]map[i];
@@ -62,7 +65,7 @@ public:
         init(row, column);
     }
 
-    void Load(const char* fname, int check) { // 파일에서 미로 파일을 읽어옴
+    void Load(const char* fname) { // 파일에서 미로 파일을 읽어옴
         char load;
         FILE* Maze;
         fopen_s(&Maze, fname, "rb");
@@ -88,7 +91,7 @@ public:
                         else if (load == 'e') { // 입구 위치 저장
                             map[i][j] = load;
                             Node* entry = new Node(i, j);
-                            if (check == 1)
+                            if (choice == 1)
                                 locQueue.enqueue(entry);
                             else
                                 locStack.push(entry);
@@ -121,7 +124,11 @@ public:
 
     void print() {  //현재 Maze를 화면에 출력
         printf("전체 미로의 크기 = %d * %d\n", row, column);
+
+        if (choice == 1) printf("너비 우선 탐색(Queue) 방법으로 ");
+        else if (choice == 2) printf("깊이 우선 탐색(Stack) 방법으로 ");
         printf("길을 탐색한 횟수 : %d\n", count);
+
         for (int i = 0; i < row; ++i) {
             for (int j = 0; j < column; ++j) {
                 if (map[i][j] == 0) {
@@ -158,6 +165,7 @@ public:
             if (exitLoc.getCol() == c && exitLoc.getRow() == r) {
                 printf("미로탐색 성공!!\n");
                 count = 0;
+                choice = 0;
                 return;
             }
             else {
@@ -174,6 +182,7 @@ public:
         }
         printf("미로탐색 실패ㅠㅠ\n");
         count = 0;
+        choice = 0;
     }
 
     void searchExitToQueue() { // 실제 미로를 탐색하는 함수
@@ -188,6 +197,7 @@ public:
             if (exitLoc.getCol() == c && exitLoc.getRow() == r) {
                 printf("미로탐색 성공!!\n");
                 count = 0;
+                choice = 0;
                 return;
             }
             else {
@@ -205,23 +215,23 @@ public:
         }
         printf("미로탐색 실패ㅠㅠ\n");
         count = 0;
+        choice = 0;
     }
 };
 
 int main() {
     Maze maze;
-    int check = 0;
     while (true) {
         printf("너비 우선 탐색(Queue) : 1 , 깊이 우선 탐색(Stack) : 2\n");
-        scanf_s("%d", &check);
-        maze.Load("미로 행열개수세기.txt", check);
-        if (check == 1)
+        scanf_s("%d", &choice);
+        maze.Load("미로 행열개수세기2.txt");
+        if (choice == 1)
             maze.searchExitToQueue();
         else
             maze.searchExitToStack();
         printf("초기화면 1, 프로그램 종료 2\n");
-        scanf_s("%d", &check);
-        if (check == 2)
+        scanf_s("%d", &choice);
+        if (choice == 2)
             break;
     }
 }
