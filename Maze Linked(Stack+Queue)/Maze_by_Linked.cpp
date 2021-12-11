@@ -18,45 +18,52 @@ private:
     Location2D exitLoc;     // 미로의 출구
     int count = 0;          // 길을 찾는 횟수
 public:
-    void init(int row, int col) { //map 이차원 배열을 동적으로 할당
+    void init(int row, int col) { //map 이차원 배열을 동적할당
         map = new int* [row];
         for (int i = 0; i < row; i++)
             map[i] = new int[col];
     }
 
-    void reset() { //미로 맵 maze를 동적으로 해제
+    void reset() { //미로 맵 maze 동적할당 해제
         for (int i = 0; i < row; i++)
             delete[]map[i];
         delete[]map;
     }
 
-    bool CheckData(const char* fname) {     // 행열 값이 주어지는지 확인
+    bool CheckData(const char* fname) {  // 행열 값이 주어지는지 확인
         char load;
         FILE* Maze;
         fopen_s(&Maze, fname, "rb");
         if (Maze != NULL) {
-            fscanf_s(Maze, "%d %d", &row, &column);
-            if ((load = fgetc(Maze)) == '\n' || load == '\r') {
-                init(row, column);
-                fclose(Maze);
-                return true;    // 행열 값 있음
-            }
-            else {
-                fclose(Maze);
-                RowNCol(fname);
-                return false;   /// 행열 값 없음
+            fscanf_s(Maze, "%d %d", &row, &column);         // 첫 줄에서 두개의 숫자 이후에
+            while (1) {
+                if ((load = fgetc(Maze)) == ' ') continue;  // 공백이 아닐때까지 읽어서
+                else if (load == '\n' || load == '\r') {    // 개행 문자 or 캐리지리턴일 경우에
+                    init(row, column);     // 첫 줄에서 두개의 숫자는 행열 표기가 맞으므로 2차원 배열 초기화
+                    fclose(Maze);
+                    return true;    // 행열 값 있음
+                }
+                else {
+                    fclose(Maze);
+                    RowNCol(fname); // 행열을 세는 함수 호출
+                    return false;   // 행열 값 없음
+                }
             }
         }
     }
 
     void RowNCol(const char* fname) {    // 행열 세기
         char load;
-        int c = 0, r = 1;
+        int c = 0, r = 1;      // 첫줄부터 읽으므로 row는 1부터 시작
         FILE* Maze;
         fopen_s(&Maze, fname, "rb");
         if (Maze != NULL) {
+            // 첫번째 while문에서는 첫줄만 읽어서 공백이 아닌 부분의 개수를 세어 col의 값을 센다.
             while ((load = fgetc(Maze)) != '\n' && load != '\r') { if (load != ' ') ++c; }
+            
+            // 두번째 while문에서는 개행문자의 개수만 세어서 row의 값을 센다.
             while ((load = fgetc(Maze)) != EOF) { if (load == '\n') ++r; }
+            
             fclose(Maze);
         }
         // printf("행 * 열  = %d * %d\n", r, c);
@@ -154,7 +161,6 @@ public:
 
     void searchExitToStack() { // 실제 미로를 탐색하는 함수
         print();
-        Sleep(400);
         while (locStack.isEmpty() == false) {  // 스택이 비어있지 않는 동안
             Location2D* here = locStack.pop()->getLocation(); // 스택에 상단 객체 복사
             ++count;
