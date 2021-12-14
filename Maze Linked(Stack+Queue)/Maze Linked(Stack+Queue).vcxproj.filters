@@ -35,6 +35,11 @@
     <Text Include="미로 행열개수세기.txt">
       <Filter>헤더 파일</Filter>
     </Text>
+    <Text Include="data_9_8.txt" />
+    <Text Include="data_15_15.txt" />
+    <Text Include="data_20_30.txt" />
+    <Text Include="data_30_30.txt" />
+    <Text Include="data_50_50.txt" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Maze_by_Linked.cpp">

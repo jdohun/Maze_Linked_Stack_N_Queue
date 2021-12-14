@@ -28,6 +28,11 @@
     <ClCompile Include="Maze_by_Linked.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <Text Include="data_15_15.txt" />
+    <Text Include="data_20_30.txt" />
+    <Text Include="data_30_30.txt" />
+    <Text Include="data_50_50.txt" />
+    <Text Include="data_9_8.txt" />
     <Text Include="미로 test.txt" />
     <Text Include="미로 행열개수세기.txt" />
   </ItemGroup>

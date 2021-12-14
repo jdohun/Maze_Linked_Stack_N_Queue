@@ -161,9 +161,9 @@ public:
         print();
         while (locStack.isEmpty() == false) {  // 스택이 비어있지 않는 동안
             Location2D* here = locStack.pop()->getLocation(); // 스택에 상단 객체 복사
+            ++count;
             int r = here->getRow();
             int c = here->getCol();
-            if (map[r][c] == 7) continue;
 
             map[r][c] = 7; // 시작점은 최적 경로
             if (exitLoc.getCol() == c && exitLoc.getRow() == r) {
@@ -174,7 +174,6 @@ public:
             }
             else {
                 map[r][c] = 7; //지나온 곳으로 표기
-                ++count;
                 system("cls");
                 print();
                 // 갈 수 있는 곳 다 가본다
